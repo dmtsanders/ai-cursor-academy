@@ -30,7 +30,7 @@ export default function ClassDetailPage() {
 
   const fetchClass = async () => {
     try {
-      const response = await fetch(`/api/classes?id=${classId}`);
+      const response = await fetch(`/api/classes/${classId}`);
       const data = await response.json();
       setClassItem(data.class);
     } catch (error) {

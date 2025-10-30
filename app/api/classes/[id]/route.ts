@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
 
+// Be permissive with the context type to support different Next.js signatures
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: any
 ) {
   try {
     const supabase = createServerClient();
-    const classId = params.id;
+    // Support both context.params and Promise<context.params>
+    const rawParams = context?.params;
+    const resolvedParams = typeof rawParams?.then === 'function' ? await rawParams : rawParams;
+    const classId: string = resolvedParams?.id;
 
     const { data: classData, error } = await supabase
       .from('classes')
