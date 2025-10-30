@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
 
-// Be permissive with the context type to support different Next.js signatures
+type RouteContext = { params: Promise<{ id: string }> } | { params: { id: string } };
+
 export async function GET(
   request: NextRequest,
-  context: any
-) {
+  context: RouteContext
+) : Promise<NextResponse> {
   try {
     const supabase = createServerClient();
     // Support both context.params and Promise<context.params>
-    const rawParams = context?.params;
+    // @ts-expect-error - Next.js may pass params as a Promise in v16
+    const rawParams = (context as any)?.params;
     const resolvedParams = typeof rawParams?.then === 'function' ? await rawParams : rawParams;
     const classId: string = resolvedParams?.id;
 
